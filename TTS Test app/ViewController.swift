@@ -8,31 +8,61 @@
 import UIKit
 import AVFoundation
 
-class ViewController: UIViewController, AVSpeechSynthesizerDelegate {
-
-    let myStory = "Here goes long story of a tiger in big jungle, where he used to stay with mama tiger & papa tiger"
-    
+class ViewController: UIViewController {
+        
     @IBOutlet weak var textView: UITextView!
-    
-    let avSpeechSynthesizer = AVSpeechSynthesizer()
-    var utterance: AVSpeechUtterance?
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let mutableAttributedString = NSMutableAttributedString(string: myStory)
-        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
-                                             value: UIColor.orange,
-                                             range:  NSMakeRange(0, myStory.count))
+        textView.text = "Here goes long story of a tiger in big jungle, where he used to stay with mama tiger & papa tiger, papa tiger always goes for hunting & mama tiger takes care of little baby tiger. Baby tiger loves to go to school"
         
-        textView.attributedText = mutableAttributedString
-               
+        let gs = UIPanGestureRecognizer(target: self,
+                                        action: #selector(handleGesture))
+        self.view.addGestureRecognizer(gs)
+        
+    }
+    
+    @objc func handleGesture() {
+        textView.resignFirstResponder()
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        StoryManager.shared.story = textView.text ?? ""
+        textView.endEditing(true)
+    }
+}
+
+
+class StoryManager {
+    static var shared = StoryManager()
+    var story = ""
+}
+
+class SpeakController: UIViewController, AVSpeechSynthesizerDelegate {
+    
+    @IBOutlet weak var label: UILabel!
+    
+    let avSpeechSynthesizer = AVSpeechSynthesizer()
+    var utterance: AVSpeechUtterance?
+    
+    override func viewDidLoad() {
         avSpeechSynthesizer.delegate = self
-        utterance = AVSpeechUtterance(string: myStory)
+        utterance = AVSpeechUtterance(string: StoryManager.shared.story)
         utterance?.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance?.volume = 0.1
         utterance?.rate = 0.5
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
+        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
+                                             value: UIColor.orange,
+                                             range:  NSMakeRange(0, StoryManager.shared.story.count))
+        
+        label.attributedText = mutableAttributedString
     }
     
     @IBAction func play(_ sender: UIButton) {
@@ -54,15 +84,12 @@ class ViewController: UIViewController, AVSpeechSynthesizerDelegate {
         avSpeechSynthesizer.stopSpeaking(at: .immediate)
     }
 
-    
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
 
         let mutableAttributedString = NSMutableAttributedString(string: utterance.speechString)
-        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, myStory.count))
+        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
         mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: NSMakeRange(0, characterRange.location + characterRange.length) )
-        print(characterRange)
-        textView.attributedText = mutableAttributedString
-//        print (mutableAttributedString) //debug message
+        label.attributedText = mutableAttributedString
     }
 }
 
