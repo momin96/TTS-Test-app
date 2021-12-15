@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		50A417402769ABED00A25457 /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A4173F2769ABED00A25457 /* SpeechRecognizer.swift */; };
 		50CF38302764AB78009B78E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CF382F2764AB78009B78E4 /* AppDelegate.swift */; };
 		50CF38322764AB78009B78E4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CF38312764AB78009B78E4 /* SceneDelegate.swift */; };
 		50CF38342764AB78009B78E4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CF38332764AB78009B78E4 /* ViewController.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		50A4173F2769ABED00A25457 /* SpeechRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		50CF382C2764AB78009B78E4 /* TTS Test app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TTS Test app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		50CF382F2764AB78009B78E4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		50CF38312764AB78009B78E4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				50CF382F2764AB78009B78E4 /* AppDelegate.swift */,
 				50CF38312764AB78009B78E4 /* SceneDelegate.swift */,
 				50CF38332764AB78009B78E4 /* ViewController.swift */,
+				50A4173F2769ABED00A25457 /* SpeechRecognizer.swift */,
 				50CF38352764AB78009B78E4 /* Main.storyboard */,
 				50CF38382764AB7A009B78E4 /* Assets.xcassets */,
 				50CF383A2764AB7A009B78E4 /* LaunchScreen.storyboard */,
@@ -138,6 +141,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50CF38342764AB78009B78E4 /* ViewController.swift in Sources */,
+				50A417402769ABED00A25457 /* SpeechRecognizer.swift in Sources */,
 				50CF38302764AB78009B78E4 /* AppDelegate.swift in Sources */,
 				50CF38322764AB78009B78E4 /* SceneDelegate.swift in Sources */,
 			);
