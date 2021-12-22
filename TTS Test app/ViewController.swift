@@ -8,10 +8,9 @@
 import UIKit
 import AVFoundation
 
-class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
+class ViewController: UIViewController {
         
     @IBOutlet weak var textView: UITextView!
-    @IBOutlet var recordingTimeLabel: UILabel!
     @IBOutlet var record_btn_ref: UIButton!
     @IBOutlet var play_btn_ref: UIButton!
     
@@ -24,7 +23,97 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
                                         action: #selector(handleGesture))
         self.view.addGestureRecognizer(gs)
         
+        let chararacterSet = CharacterSet.whitespacesAndNewlines.union(.punctuationCharacters)
+        let components = textView.text.components(separatedBy: chararacterSet)
+        let words = components.filter { !$0.isEmpty }
+        print(words.count)
+    }
+    
+    @objc func handleGesture() {
+        textView.resignFirstResponder()
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        StoryManager.shared.story = textView.text ?? ""
+        textView.endEditing(true)
+    }
+}
+
+
+class StoryManager {
+    static var shared = StoryManager()
+    var story = ""
+}
+
+class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechRecognizerdelegate, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
+   
+    
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var choice: UISwitch!
+    @IBOutlet weak var humanVoiceRecordButton: UIButton!
+    @IBOutlet weak var playButton: UIButton!
+    @IBOutlet weak var recordingTimeLabel: UILabel!
+
+    let avSpeechSynthesizer = AVSpeechSynthesizer()
+    var utterance: AVSpeechUtterance?
+    
+//    var isRecording = false
+//    var speechRecognizer = SpeechRecognizer()
+    
+    override func viewDidLoad() {
         requestAudioPermission()
+
+        avSpeechSynthesizer.delegate = self
+        utterance = AVSpeechUtterance(string: StoryManager.shared.story)
+        utterance?.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance?.volume = 0.1
+        utterance?.rate = 0.5
+        
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
+        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
+                                             value: UIColor.orange,
+                                             range:  NSMakeRange(0, StoryManager.shared.story.count))
+        
+        label.attributedText = mutableAttributedString
+        
+//        speechRecognizer.reset()
+//        speechRecognizer.transcribe()
+//        isRecording = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+//        speechRecognizer.stopTranscribing()
+//        isRecording = false
+    }
+    
+    func requestAudioPermission()
+    {
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case AVAudioSessionRecordPermission.granted:
+            isAudioRecordingGranted = true
+            break
+        case AVAudioSessionRecordPermission.denied:
+            isAudioRecordingGranted = false
+            break
+        case AVAudioSessionRecordPermission.undetermined:
+            AVAudioSession.sharedInstance().requestRecordPermission({ (allowed) in
+                if allowed {
+                    self.isAudioRecordingGranted = true
+                } else {
+                    self.isAudioRecordingGranted = false
+                }
+            })
+            break
+        default:
+            break
+        }
     }
     
     func getDocumentsDirectory() -> URL
@@ -44,29 +133,83 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
     var audioRecorder: AVAudioRecorder!
     var audioPlayer : AVAudioPlayer!
     var meterTimer:Timer!
+    var textColorTimer: Timer!
     var isAudioRecordingGranted: Bool!
     var isRecording = false
     var isPlaying = false
     
-    @IBAction func start_recording(_ sender: UIButton)
-    {
-        if(isRecording)
-        {
-            finishAudioRecording(success: true)
-            record_btn_ref.setTitle("Record", for: .normal)
-            play_btn_ref.isEnabled = true
-            isRecording = false
-        }
-        else
-        {
-            setup_recorder()
+    
+    var startPotion = 0
+    var elapsedWordCount = 0
+    
+    var counter = 0
+    var stringLength = 0
+    
+    @objc func updateTextColor(_ timer: Timer) {
+        
+//        let storyLength = StoryManager.shared.story.count
+        
+//        let chararacterSet = CharacterSet.whitespacesAndNewlines//.union(.punctuationCharacters)
+//        let components = StoryManager.shared.story.components(separatedBy: chararacterSet)
+//        let words = components.filter { !$0.isEmpty }
+        
+//        let spokenWordsPerSecond = words.count / Int(audioPlayer.duration)
 
-            audioRecorder.record()
-            meterTimer = Timer.scheduledTimer(timeInterval: 0.1, target:self, selector:#selector(self.updateAudioMeter(timer:)), userInfo:nil, repeats:true)
-            record_btn_ref.setTitle("Stop", for: .normal)
-            play_btn_ref.isEnabled = false
-            isRecording = true
+        if counter < self.rangeList.count {
+//            var subString = ""
+//            for index in 0...elapsedWordCount + spokenWordsPerSecond {
+//                print("words.count \(words.count) index \(index)")
+//                if index < words.count {
+//                    subString.append(words[index])
+//                    subString.append(" ")
+//                }
+//            }
+//            let subStringLength = subString.count
+            
+            let length = self.rangeList[counter]
+            
+            stringLength += length
+            
+            let range = NSRange(location: 0, length: stringLength)
+
+//            print("startPotion \(elapsedWordCount)  length \(subStringLength) range \(range)")
+            let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
+            mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
+            mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: range)
+            label.attributedText = mutableAttributedString
+            
+//            elapsedWordCount += spokenWordsPerSecond
+            
+            counter += 1
+            
+        } else {
+            textColorTimer.invalidate()
+            textColorTimer = nil
+            counter = 0
+            stringLength = 0
         }
+        
+//        if startPotion <= storyLength {
+//            let length = storyLength / Int(audioPlayer.duration)
+//
+//            var range = NSRange(location: 0, length: startPotion + length)
+//
+//            if startPotion + length > storyLength {
+//                let newLength = startPotion + length - storyLength
+//                range = NSRange(location: 0, length: startPotion + newLength)
+//            }
+//
+//            print("startPotion \(startPotion)  length \(length) range \(range)")
+//            let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
+//            mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
+//            mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: range)
+//            label.attributedText = mutableAttributedString
+//
+//            startPotion += length
+//        } else {
+//            textColorTimer.invalidate()
+//            textColorTimer = nil
+//        }
     }
     
     @objc func updateAudioMeter(timer: Timer)
@@ -94,35 +237,91 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
             print("Error")
         }
     }
+    
+    @IBAction func choiceToggle(_ sender: UISwitch) {
+        humanVoiceRecordButton.isHidden = !sender.isOn
+        recordingTimeLabel.isHidden = !sender.isOn
+    }
+    
+    var rangeList = [Int]()
 
-    @IBAction func play_recording(_ sender: Any)
-    {
-        if(isPlaying)
-        {
-            audioPlayer.stop()
-            record_btn_ref.isEnabled = true
-            play_btn_ref.setTitle("Play", for: .normal)
-            isPlaying = false
-        }
-        else
-        {
-            if FileManager.default.fileExists(atPath: getFileUrl().path)
-            {
-                record_btn_ref.isEnabled = false
-                play_btn_ref.setTitle("pause", for: .normal)
-                prepare_play()
-                audioPlayer.play()
-                isPlaying = true
+    func calculateRangesForTextColoring() {
+        let chararacterSet = CharacterSet.whitespacesAndNewlines.union(.punctuationCharacters)
+        let components = StoryManager.shared.story.components(separatedBy: chararacterSet)
+        let words = components.filter { !$0.isEmpty }
+        
+        var coloredWordsCount = 0
+        
+        let duration = 15//Int(audioPlayer.duration)
+                
+        var rangeList = [Int]()
+        
+        for i in 0..<duration {
+            
+            if coloredWordsCount < words.count {
+                let wps = Int((Double(words.count - coloredWordsCount) / Double(duration - i )).rounded(.toNearestOrAwayFromZero)) // 41.0 / (15.0 - 0.0)
+                
+                var length = 0
+                for j in coloredWordsCount..<coloredWordsCount+wps {
+                    let word = words[j]
+                    
+                    length += word.count
+                }
+//                if i == 0 ||  i == duration {
+//                    length += wps-1
+//                } else {
+                    length += wps
+//                }
+                
+                rangeList.append(length)
+                
+                coloredWordsCount += wps
             }
-            else
-            {
-                display_alert(msg_title: "Error", msg_desc: "Audio file is missing.", action_title: "OK")
-            }
         }
+        
+        print("rangeList \(rangeList)")
+        
+        for r in rangeList {
+            print("range -> \(r)")
+        }
+        
+        let range = NSMakeRange(0, rangeList.last!)
+        
+        print("text range \(range)")
+        
+        self.rangeList = rangeList
+        
+//        let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
+//        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
+//        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: range)
+//        label.attributedText = mutableAttributedString
+        
     }
     
     
+    @IBAction func recordHumanVoice(_ sender: UIButton) {
+        if(isRecording)
+        {
+            finishAudioRecording(success: true)
+            humanVoiceRecordButton.setTitle("Record", for: .normal)
+            playButton.isEnabled = true
+            isRecording = false
+            
+            // Perform calculation
+            calculateRangesForTextColoring()
+        }
+        else
+        {
+            setup_recorder()
 
+            audioRecorder.record()
+            meterTimer = Timer.scheduledTimer(timeInterval: 0.1, target:self, selector:#selector(self.updateAudioMeter(timer:)), userInfo:nil, repeats:true)
+            humanVoiceRecordButton.setTitle("Stop", for: .normal)
+            playButton.isEnabled = false
+            isRecording = true
+        }
+    }
+    
     func finishAudioRecording(success: Bool)
     {
         if success
@@ -185,104 +384,69 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
         {
             finishAudioRecording(success: false)
         }
-        play_btn_ref.isEnabled = true
+        playButton.isEnabled = true
     }
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool)
     {
-        record_btn_ref.isEnabled = true
+        humanVoiceRecordButton.isEnabled = true
     }
-    
-    
-    func requestAudioPermission()
-    {
-        switch AVAudioSession.sharedInstance().recordPermission {
-        case AVAudioSessionRecordPermission.granted:
-            isAudioRecordingGranted = true
-            break
-        case AVAudioSessionRecordPermission.denied:
-            isAudioRecordingGranted = false
-            break
-        case AVAudioSessionRecordPermission.undetermined:
-            AVAudioSession.sharedInstance().requestRecordPermission({ (allowed) in
-                if allowed {
-                    self.isAudioRecordingGranted = true
-                } else {
-                    self.isAudioRecordingGranted = false
-                }
-            })
-            break
-        default:
-            break
-        }
-    }
-    
-    @objc func handleGesture() {
-        textView.resignFirstResponder()
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        StoryManager.shared.story = textView.text ?? ""
-        textView.endEditing(true)
-    }
-}
-
-
-class StoryManager {
-    static var shared = StoryManager()
-    var story = ""
-}
-
-class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechRecognizerdelegate {
-   
-    
-    @IBOutlet weak var label: UILabel!
-    
-    let avSpeechSynthesizer = AVSpeechSynthesizer()
-    var utterance: AVSpeechUtterance?
-    
-    var isRecording = false
-    var speechRecognizer = SpeechRecognizer()
-    
-    override func viewDidLoad() {
-        avSpeechSynthesizer.delegate = self
-        utterance = AVSpeechUtterance(string: StoryManager.shared.story)
-        utterance?.voice = AVSpeechSynthesisVoice(language: "en-US")
-        utterance?.volume = 0.1
-        utterance?.rate = 0.5
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
-        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
-                                             value: UIColor.orange,
-                                             range:  NSMakeRange(0, StoryManager.shared.story.count))
-        
-        label.attributedText = mutableAttributedString
-        
-//        speechRecognizer.reset()
-//        speechRecognizer.transcribe()
-//        isRecording = true
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-//        speechRecognizer.stopTranscribing()
-//        isRecording = false
-    }
-    
-    
     
     @IBAction func play(_ sender: UIButton) {
-        guard let utterance = self.utterance else {
-            return
-        }
-        if avSpeechSynthesizer.isPaused {
-            avSpeechSynthesizer.continueSpeaking()
-        } else if !avSpeechSynthesizer.isSpeaking {
-            avSpeechSynthesizer.speak(utterance)
+        
+        if choice.isOn {
+
+            if(isPlaying)
+            {
+                audioPlayer.stop()
+                humanVoiceRecordButton.isEnabled = true
+                playButton.setTitle("Play", for: .normal)
+                isPlaying = false
+            }
+            else
+            {
+                if FileManager.default.fileExists(atPath: getFileUrl().path)
+                {
+                    humanVoiceRecordButton.isEnabled = false
+                    playButton.setTitle("pause", for: .normal)
+                    prepare_play()
+                    audioPlayer.play()
+                    isPlaying = true
+
+                    audioPlayer.enableRate = true
+
+                    let speedPerWord = Double(StoryManager.shared.story.count) / audioPlayer.duration
+                    
+                    print("audioPlayer.duration \(audioPlayer.duration) audioPlayer.rate \(audioPlayer.rate) speedPerWord \(speedPerWord)")
+
+                    textColorTimer = Timer.scheduledTimer(timeInterval: 1,
+                                                          target:self, selector:#selector(updateTextColor(_:)),
+                                                          userInfo:nil,
+                                                          repeats:true)
+
+                }
+                else
+                {
+                    display_alert(msg_title: "Error", msg_desc: "Audio file is missing.", action_title: "OK")
+                }
+            }
+            
+        } else {
+            
+            guard let utterance = self.utterance else {
+                return
+            }
+            
+            if avSpeechSynthesizer.isSpeaking {
+                avSpeechSynthesizer.pauseSpeaking(at: .word)
+                playButton.setTitle("Play", for: .normal)
+            } else if avSpeechSynthesizer.isPaused {
+                avSpeechSynthesizer.continueSpeaking()
+                playButton.setTitle("Pause", for: .normal)
+            } else if !avSpeechSynthesizer.isSpeaking {
+                avSpeechSynthesizer.speak(utterance)
+                playButton.setTitle("Pause", for: .normal)
+            }
         }
     }
 
@@ -294,6 +458,7 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
         avSpeechSynthesizer.stopSpeaking(at: .immediate)
     }
 
+    @available(iOS 13.0, *)
     func speechRecognizer(_ recognizer: SpeechRecognizer, didSpokenText text: String) {
         
     }

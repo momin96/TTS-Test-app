@@ -8,10 +8,12 @@ import Speech
 //import SwiftUI
 
 protocol SpeechRecognizerdelegate {
+    @available(iOS 13.0, *)
     func speechRecognizer(_ recognizer: SpeechRecognizer, didSpokenText text: String)
 }
 
 /// A helper for transcribing speech to text using SFSpeechRecognizer and AVAudioEngine.
+@available(iOS 13.0, *)
 class SpeechRecognizer: ObservableObject {
     enum RecognizerError: Error {
         case nilRecognizer
