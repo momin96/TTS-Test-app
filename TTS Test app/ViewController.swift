@@ -96,13 +96,13 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
     func requestAudioPermission()
     {
         switch AVAudioSession.sharedInstance().recordPermission {
-        case AVAudioSessionRecordPermission.granted:
+        case AVAudioSession.RecordPermission.granted:
             isAudioRecordingGranted = true
             break
-        case AVAudioSessionRecordPermission.denied:
+        case AVAudioSession.RecordPermission.denied:
             isAudioRecordingGranted = false
             break
-        case AVAudioSessionRecordPermission.undetermined:
+        case AVAudioSession.RecordPermission.undetermined:
             AVAudioSession.sharedInstance().requestRecordPermission({ (allowed) in
                 if allowed {
                     self.isAudioRecordingGranted = true
@@ -147,38 +147,18 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
     
     @objc func updateTextColor(_ timer: Timer) {
         
-//        let storyLength = StoryManager.shared.story.count
-        
-//        let chararacterSet = CharacterSet.whitespacesAndNewlines//.union(.punctuationCharacters)
-//        let components = StoryManager.shared.story.components(separatedBy: chararacterSet)
-//        let words = components.filter { !$0.isEmpty }
-        
-//        let spokenWordsPerSecond = words.count / Int(audioPlayer.duration)
-
         if counter < self.rangeList.count {
-//            var subString = ""
-//            for index in 0...elapsedWordCount + spokenWordsPerSecond {
-//                print("words.count \(words.count) index \(index)")
-//                if index < words.count {
-//                    subString.append(words[index])
-//                    subString.append(" ")
-//                }
-//            }
-//            let subStringLength = subString.count
-            
             let length = self.rangeList[counter]
             
             stringLength += length
             
             let range = NSRange(location: 0, length: stringLength)
 
-//            print("startPotion \(elapsedWordCount)  length \(subStringLength) range \(range)")
             let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
             mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
             mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: range)
             label.attributedText = mutableAttributedString
             
-//            elapsedWordCount += spokenWordsPerSecond
             
             counter += 1
             
@@ -188,28 +168,6 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
             counter = 0
             stringLength = 0
         }
-        
-//        if startPotion <= storyLength {
-//            let length = storyLength / Int(audioPlayer.duration)
-//
-//            var range = NSRange(location: 0, length: startPotion + length)
-//
-//            if startPotion + length > storyLength {
-//                let newLength = startPotion + length - storyLength
-//                range = NSRange(location: 0, length: startPotion + newLength)
-//            }
-//
-//            print("startPotion \(startPotion)  length \(length) range \(range)")
-//            let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
-//            mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
-//            mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: range)
-//            label.attributedText = mutableAttributedString
-//
-//            startPotion += length
-//        } else {
-//            textColorTimer.invalidate()
-//            textColorTimer = nil
-//        }
     }
     
     @objc func updateAudioMeter(timer: Timer)
@@ -246,13 +204,13 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
     var rangeList = [Int]()
 
     func calculateRangesForTextColoring() {
-        let chararacterSet = CharacterSet.whitespacesAndNewlines.union(.punctuationCharacters)
+        let chararacterSet = CharacterSet.whitespacesAndNewlines//.union(.punctuationCharacters)
         let components = StoryManager.shared.story.components(separatedBy: chararacterSet)
         let words = components.filter { !$0.isEmpty }
         
         var coloredWordsCount = 0
         
-        let duration = 15//Int(audioPlayer.duration)
+        let duration = Int(audioPlayer.duration)
                 
         var rangeList = [Int]()
         
@@ -261,41 +219,31 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
             if coloredWordsCount < words.count {
                 let wps = Int((Double(words.count - coloredWordsCount) / Double(duration - i )).rounded(.toNearestOrAwayFromZero)) // 41.0 / (15.0 - 0.0)
                 
-                var length = 0
+                var wordLength = 0
                 for j in coloredWordsCount..<coloredWordsCount+wps {
-                    let word = words[j]
-                    
-                    length += word.count
+                    wordLength += words[j].count
                 }
-//                if i == 0 ||  i == duration {
-//                    length += wps-1
-//                } else {
-                    length += wps
-//                }
-                
-                rangeList.append(length)
+
+                wordLength += wps
+
+                if i == duration - 1 {
+                    rangeList.append(wordLength - 1)
+                } else {
+                    rangeList.append(wordLength)
+                }
                 
                 coloredWordsCount += wps
             }
         }
+
         
-        print("rangeList \(rangeList)")
-        
-        for r in rangeList {
-            print("range -> \(r)")
+        let totalWords = rangeList.reduce(0) { partialResult, v in
+            partialResult + v
         }
         
-        let range = NSMakeRange(0, rangeList.last!)
-        
-        print("text range \(range)")
+        print("totalWords \(totalWords)  storylength \(StoryManager.shared.story.count)")
         
         self.rangeList = rangeList
-        
-//        let mutableAttributedString = NSMutableAttributedString(string: StoryManager.shared.story)
-//        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.orange, range:  NSMakeRange(0, StoryManager.shared.story.count))
-//        mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: range)
-//        label.attributedText = mutableAttributedString
-        
     }
     
     
@@ -306,6 +254,9 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
             humanVoiceRecordButton.setTitle("Record", for: .normal)
             playButton.isEnabled = true
             isRecording = false
+            
+            // Make sure `audioPlayer` instance is initilized
+            prepare_play()
             
             // Perform calculation
             calculateRangesForTextColoring()
@@ -409,15 +360,11 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
                 {
                     humanVoiceRecordButton.isEnabled = false
                     playButton.setTitle("pause", for: .normal)
-                    prepare_play()
+//                    prepare_play()
                     audioPlayer.play()
                     isPlaying = true
 
                     audioPlayer.enableRate = true
-
-                    let speedPerWord = Double(StoryManager.shared.story.count) / audioPlayer.duration
-                    
-                    print("audioPlayer.duration \(audioPlayer.duration) audioPlayer.rate \(audioPlayer.rate) speedPerWord \(speedPerWord)")
 
                     textColorTimer = Timer.scheduledTimer(timeInterval: 1,
                                                           target:self, selector:#selector(updateTextColor(_:)),
