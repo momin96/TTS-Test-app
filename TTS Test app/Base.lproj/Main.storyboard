@@ -47,7 +47,12 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="scg-Kz-OP8">
-                        <barButtonItem key="rightBarButtonItem" title="Next" id="sMD-qK-j3g">
+                        <barButtonItem key="leftBarButtonItem" title="Scan" id="QOP-Tq-DtP">
+                            <connections>
+                                <segue destination="7wK-vS-cwB" kind="show" id="9iA-da-Oxh"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Speak" id="sMD-qK-j3g">
                             <connections>
                                 <segue destination="Mgl-Ht-AIA" kind="show" id="WRh-3V-kao"/>
                             </connections>
@@ -60,6 +65,65 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1015.9420289855074" y="71.651785714285708"/>
+        </scene>
+        <!--Scanner Controller-->
+        <scene sceneID="BmE-su-zBo">
+            <objects>
+                <viewController storyboardIdentifier="ScannerController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="7wK-vS-cwB" customClass="ScannerController" customModule="TTS_Test_app" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="osF-XQ-tFC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="bcx-tc-NWl">
+                                <rect key="frame" x="0.0" y="138" width="414" height="724"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="Hwk-5Y-pO9">
+                                <rect key="frame" x="188.5" y="429.5" width="37" height="37"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scanned Text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VFI-9J-yvv">
+                                <rect key="frame" x="20" y="109" width="103" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="42" id="het-Mt-v3k"/>
+                                    <constraint firstAttribute="height" constant="21" id="j4f-ky-bac"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" systemColor="secondaryLabelColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Kzz-Ip-a9n"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="VFI-9J-yvv" firstAttribute="top" secondItem="Kzz-Ip-a9n" secondAttribute="top" constant="21" id="E6M-8i-rio"/>
+                            <constraint firstItem="Kzz-Ip-a9n" firstAttribute="trailing" secondItem="bcx-tc-NWl" secondAttribute="trailingMargin" constant="8" id="LrK-Pv-XbQ"/>
+                            <constraint firstItem="bcx-tc-NWl" firstAttribute="bottom" secondItem="Kzz-Ip-a9n" secondAttribute="bottom" id="QTi-H6-h43"/>
+                            <constraint firstItem="Hwk-5Y-pO9" firstAttribute="centerY" secondItem="osF-XQ-tFC" secondAttribute="centerY" id="dqn-5E-rUJ"/>
+                            <constraint firstItem="Kzz-Ip-a9n" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="VFI-9J-yvv" secondAttribute="trailing" symbolic="YES" id="fCh-of-51z"/>
+                            <constraint firstItem="bcx-tc-NWl" firstAttribute="top" secondItem="Kzz-Ip-a9n" secondAttribute="top" constant="50" id="i1F-RP-ohe"/>
+                            <constraint firstItem="Hwk-5Y-pO9" firstAttribute="centerX" secondItem="osF-XQ-tFC" secondAttribute="centerX" id="nEK-CU-uNN"/>
+                            <constraint firstItem="bcx-tc-NWl" firstAttribute="leadingMargin" secondItem="Kzz-Ip-a9n" secondAttribute="leading" constant="8" id="pIZ-fn-sDi"/>
+                            <constraint firstItem="VFI-9J-yvv" firstAttribute="leading" secondItem="Kzz-Ip-a9n" secondAttribute="leading" constant="20" id="vcd-FN-7bo"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="HhB-ge-sUL">
+                        <barButtonItem key="rightBarButtonItem" title="Scan" id="3YB-He-aXN">
+                            <connections>
+                                <action selector="scanText:" destination="7wK-vS-cwB" id="CCn-59-2Mh"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="loadingIndicator" destination="Hwk-5Y-pO9" id="t6i-9f-Kra"/>
+                        <outlet property="textView" destination="bcx-tc-NWl" id="8wo-8c-7Z0"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iVj-yW-DNe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1015.9420289855074" y="859.82142857142856"/>
         </scene>
         <!--Speak Controller-->
         <scene sceneID="cNl-yO-jRM">

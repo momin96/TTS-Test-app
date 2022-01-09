@@ -14,6 +14,7 @@
 		50CF38372764AB78009B78E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50CF38352764AB78009B78E4 /* Main.storyboard */; };
 		50CF38392764AB7A009B78E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50CF38382764AB7A009B78E4 /* Assets.xcassets */; };
 		50CF383C2764AB7A009B78E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50CF383A2764AB7A009B78E4 /* LaunchScreen.storyboard */; };
+		8B2F53142789F83500D7EBF1 /* ScannerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2F53132789F83500D7EBF1 /* ScannerController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		50CF38382764AB7A009B78E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		50CF383B2764AB7A009B78E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		50CF383D2764AB7A009B78E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B2F53132789F83500D7EBF1 /* ScannerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScannerController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				50CF38312764AB78009B78E4 /* SceneDelegate.swift */,
 				50CF38332764AB78009B78E4 /* ViewController.swift */,
 				50A4173F2769ABED00A25457 /* SpeechRecognizer.swift */,
+				8B2F53132789F83500D7EBF1 /* ScannerController.swift */,
 				50CF38352764AB78009B78E4 /* Main.storyboard */,
 				50CF38382764AB7A009B78E4 /* Assets.xcassets */,
 				50CF383A2764AB7A009B78E4 /* LaunchScreen.storyboard */,
@@ -140,6 +143,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B2F53142789F83500D7EBF1 /* ScannerController.swift in Sources */,
 				50CF38342764AB78009B78E4 /* ViewController.swift in Sources */,
 				50A417402769ABED00A25457 /* SpeechRecognizer.swift in Sources */,
 				50CF38302764AB78009B78E4 /* AppDelegate.swift in Sources */,
