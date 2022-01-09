@@ -504,7 +504,7 @@ struct VoicesItemList: View {
                             Spacer()
                             currentVoice.map { value in
                                 VStack {
-                                    if item.language == value.language {
+                                    if item.language == value.language && item.name == value.name {
                                         Image(systemName: "checkmark")
                                     }
                                 }
