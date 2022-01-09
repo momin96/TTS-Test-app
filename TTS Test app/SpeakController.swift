@@ -7,16 +7,34 @@
 
 import UIKit
 import AVFoundation
+import SwiftUI
 
+@available(iOS 13.0, *)
 class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechRecognizerdelegate, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
    
+    enum VoiceState: String {
+        case Play
+        case Pause
+        case Stop
+    }
+    
+    var currentVoice: AVSpeechSynthesisVoice?
+    
+    var currentVoiceState: VoiceState = .Play {
+        didSet {
+            playButton.setTitle(currentVoiceState.rawValue, for: .normal)
+        }
+    }
     
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var choice: UISwitch!
     @IBOutlet weak var humanVoiceRecordButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var recordingTimeLabel: UILabel!
-
+    @IBOutlet weak var selectedVoiceButton: UIButton!
+    @IBOutlet weak var voiceSpeed: UISlider!
+    @IBOutlet weak var speedLabel: UILabel!
+    
     let avSpeechSynthesizer = AVSpeechSynthesizer()
     var utterance: AVSpeechUtterance?
     
@@ -27,14 +45,22 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
         requestAudioPermission()
 
         avSpeechSynthesizer.delegate = self
+        updateVoice(with: AVSpeechSynthesisVoice.currentLanguageCode())
+    }
+    
+    fileprivate func updateVoice(with language: String, and name: String? = nil) {
+        
+        var title = language
+        if let name = name {
+            title += " - \(name)"
+        }
+        
+        selectedVoiceButton.setTitle(title, for: .normal)
         utterance = AVSpeechUtterance(string: StoryManager.shared.story)
-        utterance?.voice = AVSpeechSynthesisVoice(language: "en-US")
-        utterance?.volume = 0.1
-        utterance?.rate = 0.5
-        
-        let voices = AVSpeechSynthesisVoice.speechVoices()
-        print("voices \(voices)")
-        
+        utterance?.voice = AVSpeechSynthesisVoice(language: language)
+        currentVoice = utterance?.voice
+        utterance?.volume = 0.9
+        updateVoiceSpeed(with: voiceSpeed.value)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -308,7 +334,7 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
         humanVoiceRecordButton.isEnabled = true
     }
     
-    @IBAction func play(_ sender: UIButton) {
+    @IBAction func play(_ sender: UIButton!) {
         
         if choice.isOn {
 
@@ -316,7 +342,7 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
             {
                 audioPlayer.stop()
                 humanVoiceRecordButton.isEnabled = true
-                playButton.setTitle("Play", for: .normal)
+                currentVoiceState = .Play
                 isPlaying = false
             }
             else
@@ -324,8 +350,8 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
                 if FileManager.default.fileExists(atPath: getFileUrl().path)
                 {
                     humanVoiceRecordButton.isEnabled = false
-                    playButton.setTitle("pause", for: .normal)
-//                    prepare_play()
+                    currentVoiceState = .Pause
+                    //                    prepare_play()
                     audioPlayer.play()
                     isPlaying = true
 
@@ -351,13 +377,13 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
             
             if avSpeechSynthesizer.isSpeaking {
                 avSpeechSynthesizer.pauseSpeaking(at: .word)
-                playButton.setTitle("Play", for: .normal)
+                currentVoiceState = .Play
             } else if avSpeechSynthesizer.isPaused {
                 avSpeechSynthesizer.continueSpeaking()
-                playButton.setTitle("Pause", for: .normal)
+                currentVoiceState = .Pause
             } else if !avSpeechSynthesizer.isSpeaking {
                 avSpeechSynthesizer.speak(utterance)
-                playButton.setTitle("Pause", for: .normal)
+                currentVoiceState = .Pause
             }
         }
     }
@@ -367,9 +393,39 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
     }
     
     @IBAction func stop(_ sender: UIButton) {
-        avSpeechSynthesizer.stopSpeaking(at: .immediate)
+        stopVoicePlaying()
     }
 
+    @IBAction func selectVoice(_ sender: UIButton) {
+        showAvailableVoices()
+    }
+    
+    @IBAction func voiceSpeedChanged(_ sender: UISlider) {
+        updateVoiceSpeed(with: sender.value)
+    }
+    
+    fileprivate func updateVoiceSpeed(with value: Float) {
+        utterance?.rate = value
+        speedLabel.text = String(Int(value * 100.0)) + "%"
+        stopVoicePlaying()
+    }
+    
+    enum VoiceGender {
+        case male
+        case female
+    }
+    
+    var voiceGender: VoiceGender = .female
+    
+    @IBAction func voiceGenderChanged(_ sender: UISwitch) {
+        updateVoiceGender(sender.isOn)
+    }
+    
+    fileprivate func updateVoiceGender(_ isMale: Bool) {
+        voiceGender = isMale ? .male : .female
+//        utterance?.voice?.gender = isMale ? .male : .female
+    }
+    
     @available(iOS 13.0, *)
     func speechRecognizer(_ recognizer: SpeechRecognizer, didSpokenText text: String) {
         
@@ -383,5 +439,80 @@ class SpeakController: UIViewController, AVSpeechSynthesizerDelegate, SpeechReco
         mutableAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: NSMakeRange(0, characterRange.location + characterRange.length) )
         label.attributedText = mutableAttributedString
     }
+    
+        
 }
 
+@available(iOS 13.0, *)
+extension SpeakController {
+    
+    
+    fileprivate func stopVoicePlaying() {
+        avSpeechSynthesizer.stopSpeaking(at: .immediate)
+        currentVoiceState = .Play
+        
+    }
+    
+    func showAvailableVoices() {
+        
+        stopVoicePlaying()
+        let voices = AVSpeechSynthesisVoice.speechVoices()
+
+        
+        let voiceListView = VoicesItemList(voices: voices,
+                                           currentVoice: currentVoice) { [weak self] selectedVoice in
+            self?.updateVoice(with: selectedVoice.language, and: selectedVoice.name)
+        }
+        
+        let hostingContoller = UIHostingController(rootView: voiceListView)
+        present(hostingContoller, animated: true)
+    }
+}
+
+
+
+@available(iOS 13.0, *)
+struct VoicesItemList: View {
+    
+    @Environment(\.presentationMode) var presentationMode
+    
+    var voices: [AVSpeechSynthesisVoice]
+    var currentVoice: AVSpeechSynthesisVoice?
+    
+    var selectionHandler: (AVSpeechSynthesisVoice) -> Void
+    
+    var body: some View {
+        if #available(iOS 14.0, *) {
+            bodyView
+                .navigationTitle("Select a voice")
+        } else {
+            bodyView
+                .navigationBarTitle("Select a voice")
+        }
+    }
+    
+    var bodyView: some View {
+        NavigationView {
+            SwiftUI.Form {
+                ForEach(voices, id: \.self) { item in
+                    Button {
+                        selectionHandler(item)
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        HStack {
+                            Text("\(item.language) - \(item.name)")
+                            Spacer()
+                            currentVoice.map { value in
+                                VStack {
+                                    if item.language == value.language {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
