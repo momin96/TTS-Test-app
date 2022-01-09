@@ -6,14 +6,6 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-    <key>NSCameraUsageDescription</key>
-    <string>Camera access required to scan documents</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Photo library access required to store images</string>
-    <key>LSRequiresIPhoneOS</key>
-    <true/>
-    <key>UIMainStoryboardFile</key>
-    <string>Main</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -25,13 +17,17 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>App wants to use your device&apos;s microphone to record your story</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>App wants to recognize your voice</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access required to scan documents</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>App wants to use your device's microphone to record your story</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access required to store images</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>App wants to recognize your voice</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
