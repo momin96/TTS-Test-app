@@ -15,6 +15,7 @@
 		50CF38392764AB7A009B78E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50CF38382764AB7A009B78E4 /* Assets.xcassets */; };
 		50CF383C2764AB7A009B78E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50CF383A2764AB7A009B78E4 /* LaunchScreen.storyboard */; };
 		8B2F53142789F83500D7EBF1 /* ScannerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2F53132789F83500D7EBF1 /* ScannerController.swift */; };
+		8B2F5316278A85B800D7EBF1 /* SpeakController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2F5315278A85B800D7EBF1 /* SpeakController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		50CF383B2764AB7A009B78E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		50CF383D2764AB7A009B78E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B2F53132789F83500D7EBF1 /* ScannerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScannerController.swift; sourceTree = "<group>"; };
+		8B2F5315278A85B800D7EBF1 /* SpeakController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 				50CF38332764AB78009B78E4 /* ViewController.swift */,
 				50A4173F2769ABED00A25457 /* SpeechRecognizer.swift */,
 				8B2F53132789F83500D7EBF1 /* ScannerController.swift */,
+				8B2F5315278A85B800D7EBF1 /* SpeakController.swift */,
 				50CF38352764AB78009B78E4 /* Main.storyboard */,
 				50CF38382764AB7A009B78E4 /* Assets.xcassets */,
 				50CF383A2764AB7A009B78E4 /* LaunchScreen.storyboard */,
@@ -147,6 +150,7 @@
 				50CF38342764AB78009B78E4 /* ViewController.swift in Sources */,
 				50A417402769ABED00A25457 /* SpeechRecognizer.swift in Sources */,
 				50CF38302764AB78009B78E4 /* AppDelegate.swift in Sources */,
+				8B2F5316278A85B800D7EBF1 /* SpeakController.swift in Sources */,
 				50CF38322764AB78009B78E4 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
